@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Group Call with Roles</title>
+    <style>
+      /* General page styles */
+      body {
+        font-family: "Roboto", Arial, sans-serif; /* Use a clean font */
+        margin: 0; /* Remove default margins */
+        padding: 0; /* Remove default padding */
+        display: flex; /* Use flexbox for layout */
+        flex-direction: column; /* Arrange elements vertically */
+        align-items: center; /* Center items horizontally */
+        background-color: #121212; /* Dark background for the page */
+        color: #f4f4f9; /* Light text color */
+      }
+
+      h1 {
+        color: #00aaff; /* Title color */
+        margin: 20px 0; /* Space around the title */
+        text-transform: uppercase; /* Uppercase letters */
+        font-size: 24px; /* Font size for title */
+        letter-spacing: 1px; /* Spacing between letters */
+      }
+
+      /* Styles for video containers */
+      .controls {
+        display: flex; /* Flexbox layout for videos */
+        justify-content: center; /* Center the videos horizontally */
+        gap: 20px; /* Space between videos */
+        margin: 20px 0; /* Space around the video section */
+      }
+
+      video {
+        width: 45%; /* Video width */
+        height: auto; /* Maintain aspect ratio */
+        margin: 10px; /* Margin around videos */
+        border: 3px solid #333; /* Dark border around the videos */
+        border-radius: 12px; /* Rounded corners */
+        background-color: #000; /* Black background for video */
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5); /* Shadow effect around video */
+      }
+
+      /* Styles for the start button */
+      button {
+        padding: 10px 20px; /* Padding around the button */
+        font-size: 16px; /* Font size for button text */
+        font-weight: bold; /* Bold text */
+        color: #fff; /* White text */
+        background-color: #00aaff; /* Button color */
+        border: none; /* No border */
+        border-radius: 8px; /* Rounded button corners */
+        cursor: pointer; /* Pointer cursor on hover */
+        transition: all 0.3s ease; /* Smooth transition for hover effect */
+        margin-top: 10px; /* Space above the button */
+      }
+
+      /* Hover effect for the button */
+      button:hover {
+        background-color: #007acc; /* Darker button color on hover */
+      }
+
+      /* Chat container styling */
+      .chat-container {
+        width: 90%; /* Container width */
+        max-width: 600px; /* Maximum width of the chat */
+        border: 1px solid #333; /* Border around the chat */
+        border-radius: 8px; /* Rounded corners */
+        background-color: #1e1e1e; /* Dark background for the chat */
+        padding: 20px; /* Padding inside the chat container */
+        margin-top: 20px; /* Space above the chat */
+        box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.5); /* Shadow effect */
+      }
+
+      /* Chat heading style */
+      .chat-container h3 {
+        margin: 0; /* No margin */
+        padding: 0 0 10px; /* Padding below the heading */
+        border-bottom: 1px solid #333; /* Border below the heading */
+        font-size: 18px; /* Font size for the heading */
+        color: #00aaff; /* Blue color for heading */
+      }
+
+      /* Chat messages container */
+      .chat-messages {
+        height: 250px; /* Fixed height for messages container */
+        overflow-y: auto; /* Scrollable when messages exceed height */
+        border: 1px solid #444; /* Border around the messages */
+        padding: 10px; /* Padding inside the messages container */
+        border-radius: 5px; /* Rounded corners */
+        background-color: #181818; /* Dark background for messages */
+        margin-bottom: 15px; /* Space below messages container */
+        color: #ddd; /* Light text color */
+        font-size: 14px; /* Font size for chat messages */
+      }
+
+      /* Message text style */
+      .chat-messages p {
+        margin: 5px 0; /* Margin between messages */
+        word-wrap: break-word; /* Break long words to prevent overflow */
+      }
+
+      /* Chat input form styling */
+      .chat-form {
+        display: flex; /* Flexbox layout for input and button */
+        gap: 10px; /* Space between input and button */
+      }
+
+      /* Chat input field styling */
+      .chat-form input {
+        flex-grow: 1; /* Make input take available space */
+        padding: 10px; /* Padding inside the input */
+        border: 1px solid #444; /* Border around the input */
+        border-radius: 4px; /* Rounded corners for input */
+        background-color: #2e2e2e; /* Dark background for input */
+        color: #f4f4f9; /* Light text color */
+      }
+
+      /* Placeholder text styling */
+      .chat-form input::placeholder {
+        color: #888; /* Light grey color for placeholder */
+      }
+
+      /* Chat input submit button styling */
+      .chat-form button {
+        padding: 10px 20px; /* Padding around the button */
+        background-color: #00aaff; /* Button color */
+        color: #fff; /* White text color */
+        border: none; /* No border */
+        border-radius: 4px; /* Rounded corners */
+        font-size: 14px; /* Font size */
+        cursor: pointer; /* Pointer cursor on hover */
+        transition: all 0.3s ease; /* Smooth transition on hover */
+      }
+
+      /* Hover effect for the submit button */
+      .chat-form button:hover {
+        background-color: #007acc; /* Darker color on hover */
+      }
+
+      /* Custom scrollbar styling */
+      .chat-messages::-webkit-scrollbar {
+        width: 6px; /* Width of the scrollbar */
+      }
+
+      /* Thumb (scrollable handle) styling */
+      .chat-messages::-webkit-scrollbar-thumb {
+        background-color: #444; /* Dark color for the thumb */
+        border-radius: 4px; /* Rounded corners for the thumb */
+      }
+
+      /* Track (background of the scrollbar) styling */
+      .chat-messages::-webkit-scrollbar-track {
+        background-color: #222; /* Dark background for the scrollbar track */
+      }
+
+      /* Responsive design for mobile devices */
+      @media (max-width: 768px) {
+        video {
+          width: 100%; /* Make videos take full width on smaller screens */
+        }
+
+        .controls {
+          flex-direction: column; /* Stack videos vertically */
+          gap: 10px; /* Reduce space between videos */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Group Call with Roles</h1>
+    <div id="setup">
+      <!-- Form for users to join a room with their role -->
+      <form id="joinForm">
+        <input type="text" id="roomNumber" placeholder="Room Number" required />
+        <input type="email" id="email" placeholder="Email" required />
+        <select id="role" required>
+          <option value="">Select Role</option>
+          <option value="sender">Sender</option>
+          <option value="receiver">Receiver</option>
+        </select>
+        <button type="submit">Join Room</button>
+      </form>
+    </div>
+    <div id="room" style="display: none">
+      <div class="controls">
+        <!-- Video elements for local and remote streams -->
+        <video id="localVideo" autoplay playsinline muted></video>
+        <video id="remoteVideo" autoplay playsinline></video>
+      </div>
+      <!-- Start Streaming button, visible only to the sender -->
+      <button id="start" style="display: none">Start Streaming</button>
+      <div class="chat-container">
+        <h3>Chat</h3>
+        <!-- Chat messages -->
+        <div class="chat-messages" id="chatMessages"></div>
+        <!-- Chat input form -->
+        <form class="chat-form" id="chatForm">
+          <input
+            type="text"
+            id="chatInput"
+            placeholder="Type a message..."
+            required
+          />
+          <button type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      // Connect to the Socket.IO server
+      const socket = io();
+
+      // DOM elements
+      const joinForm = document.getElementById("joinForm");
+      const roomDiv = document.getElementById("room");
+      const setupDiv = document.getElementById("setup");
+      const startButton = document.getElementById("start");
+      const localVideo = document.getElementById("localVideo");
+      const remoteVideo = document.getElementById("remoteVideo");
+      const chatMessages = document.getElementById("chatMessages");
+      const chatForm = document.getElementById("chatForm");
+      const chatInput = document.getElementById("chatInput");
+
+      // WebRTC configuration with STUN and TURN servers
+      const config = {
+        iceServers: [
+          { urls: "stun:stun.l.google.com:19302" }, // Public STUN server
+          {
+            urls: "turn:3.217.208.70:65535", // TURN server for NAT traversal
+            username: "varunkate",
+            credential: "1234567890",
+          },
+        ],
+      };
+
+      let localStream; // Local media stream (camera + mic)
+      let peerConnections = {}; // Stores all peer connections (keyed by socket ID)
+      let roomId; // ID of the current room
+      let role; // Role of the user (sender or receiver)
+
+      // Handle form submission to join the room
+      joinForm.onsubmit = (e) => {
+        e.preventDefault(); // Prevent page refresh
+        roomId = document.getElementById("roomNumber").value.trim();
+        const email = document.getElementById("email").value.trim();
+        role = document.getElementById("role").value;
+
+        // Validate input and join the room via the server
+        if (roomId && email && role) {
+          socket.emit("joinRoom", { roomId, email, role });
+          setupDiv.style.display = "none"; // Hide setup form
+          roomDiv.style.display = "block"; // Show room UI
+
+          if (role === "sender") {
+            startButton.style.display = "block"; // Show Start Streaming button for sender
+          }
+        }
+      };
+
+      // Handle Start Streaming button click (only for sender)
+      startButton.onclick = async () => {
+        try {
+          // Request access to camera and microphone
+          localStream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: true,
+          });
+
+          // Display local stream in the local video element
+          localVideo.srcObject = localStream;
+
+          // Add local stream tracks to all peer connections
+          localStream.getTracks().forEach((track) => {
+            try {
+              Object.values(peerConnections).forEach((pc) => {
+                if (pc) {
+                  // Create a new peer connection
+                  // pc = new RTCPeerConnection(config);
+                  console.log("found pc", pc);
+                  console.log("config", config);
+                  pc.addTrack(track, localStream);
+                } else {
+                  console.error(
+                    "Peer connection is undefined while adding tracks"
+                  );
+                }
+              });
+            } catch (error) {
+              console.error("Error adding track to peer connection:", error);
+            }
+          });
+
+          console.log("Streaming started");
+        } catch (error) {
+          console.error("Error starting streaming:", error.message);
+          alert(
+            "An error occurred while starting the stream. Please check your camera/microphone settings and permissions."
+          );
+        }
+      };
+
+      // Handle new users joining the room
+      socket.on("userJoined", (data) => {
+        try {
+          if (role === "sender" && data.role === "receiver")
+            console.log("Receiver joined the room:", data.socketId);
+          {
+            const pc = createPeerConnection(data.socketId);
+            peerConnections[data.socketId] = pc;
+
+            console.log("localStream", localStream);
+
+            if (localStream) {
+              // Add local stream tracks to the new peer connection
+              localStream.getTracks().forEach((track) => {
+                try {
+                  pc.addTrack(track, localStream);
+                } catch (error) {
+                  console.error("Error adding track for new user:", error);
+                }
+              });
+
+              // Create and send an offer to the new receiver
+              pc.createOffer()
+                .then((offer) => pc.setLocalDescription(offer))
+                .then(() => {
+                  socket.emit("signal", {
+                    type: "offer",
+                    offer: pc.localDescription,
+                    to: data.socketId,
+                  });
+                })
+                .catch((error) =>
+                  console.error("Error creating or sending offer:", error)
+                );
+            } else {
+              console.warn("localStream is not initialized yet");
+            }
+          }
+        } catch (error) {
+          console.error("Error handling user joining:", error);
+        }
+      });
+
+      // WebRTC signaling handling
+      socket.on("signal", async (data) => {
+        try {
+          console.log("Received signaling data:", data);
+
+          const pc =
+            peerConnections[data.socketId] ||
+            createPeerConnection(data.socketId);
+
+          if (data.type === "offer") {
+            await pc.setRemoteDescription(data.offer);
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+            socket.emit("signal", {
+              type: "answer",
+              answer: pc.localDescription,
+              to: data.socketId,
+            });
+          } else if (data.type === "answer") {
+            await pc.setRemoteDescription(data.answer);
+          } else if (data.type === "candidate") {
+            await pc.addIceCandidate(data.candidate);
+          }
+        } catch (error) {
+          console.error("Error handling signaling data:", error);
+        }
+      });
+
+      // Create a new RTCPeerConnection
+      function createPeerConnection(socketId) {
+        try {
+          const pc = new RTCPeerConnection(config);
+
+          // Handle ICE candidate generation
+          pc.onicecandidate = (e) => {
+            try {
+              if (e.candidate) {
+                socket.emit("signal", {
+                  type: "candidate",
+                  candidate: e.candidate,
+                  to: socketId,
+                });
+              }
+            } catch (error) {
+              console.error("Error sending ICE candidate:", error);
+            }
+          };
+
+          // Handle track events to display the remote stream
+          pc.ontrack = (e) => {
+            try {
+              if (!remoteVideo.srcObject) {
+                remoteVideo.srcObject = e.streams[0];
+              }
+            } catch (error) {
+              console.error("Error setting remote video source:", error);
+            }
+          };
+
+          return pc;
+        } catch (error) {
+          console.error("Error creating peer connection:", error);
+          return null;
+        }
+      }
+      // Handle chat message submission
+      chatForm.onsubmit = (e) => {
+        e.preventDefault();
+        const message = chatInput.value.trim();
+        if (message) {
+          // Send chat message to the server
+          socket.emit("chatMessage", { roomId, message });
+          addMessage(`You: ${message}`); // Display message in chat UI
+          chatInput.value = ""; // Clear the input field
+        }
+      };
+
+      // Display incoming chat messages
+      socket.on("chatMessage", ({ message }) => addMessage(message));
+
+      // Add a message to the chat UI
+      function addMessage(message) {
+        const p = document.createElement("p");
+        p.textContent = message;
+        chatMessages.appendChild(p);
+        chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll to the latest message
+      }
+    </script>
+  </body>
+</html>
