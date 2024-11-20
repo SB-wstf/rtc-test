@@ -366,7 +366,20 @@
           } else if (data.type === "answer") {
             await pc.setRemoteDescription(data.answer);
           } else if (data.type === "candidate") {
-            await pc.addIceCandidate(data.candidate);
+            if (pc.remoteDescription) {
+              // Add the ICE candidate only if the remote description is set
+              await pc.addIceCandidate(data.candidate);
+              console.log("ICE candidate added:", data.candidate);
+            } else {
+              console.warn(
+                "Remote description not set yet, queuing candidate."
+              );
+              // Queue the ICE candidate to add later
+              if (!pc.queuedCandidates) {
+                pc.queuedCandidates = [];
+              }
+              pc.queuedCandidates.push(data.candidate);
+            }
           }
         } catch (error) {
           console.error("Error handling signaling data:", error);
@@ -382,6 +395,7 @@
           pc.onicecandidate = (e) => {
             try {
               if (e.candidate) {
+                console.log("Generated ICE candidate:", e.candidate);
                 socket.emit("signal", {
                   type: "candidate",
                   candidate: e.candidate,
@@ -404,12 +418,31 @@
             }
           };
 
+          // Handle setting remote description to process queued candidates
+          pc.onremotedescriptionset = () => {
+            if (pc.queuedCandidates && pc.queuedCandidates.length > 0) {
+              console.log(
+                `Processing queued candidates (${pc.queuedCandidates.length})`
+              );
+              pc.queuedCandidates.forEach(async (candidate) => {
+                try {
+                  await pc.addIceCandidate(candidate);
+                  console.log("Queued ICE candidate added:", candidate);
+                } catch (error) {
+                  console.error("Error adding queued candidate:", error);
+                }
+              });
+              pc.queuedCandidates = [];
+            }
+          };
+
           return pc;
         } catch (error) {
           console.error("Error creating peer connection:", error);
           return null;
         }
       }
+
       // Handle chat message submission
       chatForm.onsubmit = (e) => {
         e.preventDefault();
